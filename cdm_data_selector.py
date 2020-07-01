@@ -64,12 +64,7 @@ def find_values(age, df):
     for index, val in enumerate(groupby_ID):
         key, group = val
 
-        spine_bmd = ""
-        spine_score = ""
-        left_femur_bmd = ""
-        left_femur_score = ""
-        right_femur_bmd = ""
-        right_femur_score = ""
+        spine_bmd = spine_score = left_femur_bmd = left_femur_score = right_femur_bmd = right_femur_score = ""
 
         for t in group.itertuples():
             filename = getattr(t,'SOPInstanceUID')
@@ -126,7 +121,7 @@ def find_values(age, df):
                         )
     else:
         return 'Success'
-    return 'Failed'
+    return f'{y}_{ProtocolName}: {filename}'
 
 def save_to_dict(age, index, *args):
     if age == "eldery":
@@ -151,7 +146,7 @@ def save_to_dict(age, index, *args):
         cdm_1['Right Femur BMD'][index] = args[8]
 
 
-years = [2010]
+years = range(2007,2020)
 
 for y in years:
     # Patient who is or older than 50 years old
@@ -175,10 +170,10 @@ for y in years:
         res = find_values(key, val)
         if res == 'Success':
             if key == 'eldery':
-                pd.DataFrame.from_dict(cdm_0).to_csv('cdm_e_'+str(y)+'.csv', encoding='utf-8')
-                print(f'eldery group:{len(nf_e):,}')
+                pd.DataFrame.from_dict(cdm_0).to_csv('cdm_e_'+str(y)+'.csv', encoding='utf-8', index=False)
+                print(f'eldery group:{len(cdm_0):,}')
             else:
-                pd.DataFrame.from_dict(cdm_1).to_csv('cdm_y_'+str(y)+'.csv', encoding='utf-8')
-                print(f'youth group:{len(nf_y):,}')
+                pd.DataFrame.from_dict(cdm_1).to_csv('cdm_y_'+str(y)+'.csv', encoding='utf-8', index=False)
+                print(f'youth group:{len(cdm_1):,}')
         else:
-            print(f'ERROR from {y}')
+            print(res)
