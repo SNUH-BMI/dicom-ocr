@@ -199,20 +199,13 @@ if __name__ == "__main__":
             csv = ''
             if copy_table is None:
                 for row in table:
-                    csv += f.split('.png.json')[0] + ","
+                    csv += f.replace('png.json','dcm') + ","
                     csv += (",").join(row)
                     csv += "\n"
                 print(csv)
             else:
                 for row in copy_table:
-                    csv += f.split('.png.json')[0] + ","
+                    csv += f.replace('png.json','dcm') + ","
                     csv += (",").join(row)
                     csv += "\n"
-                print(csv)   
-
-
-# In[ ]:
-
-
-
-
+                print(csv)
