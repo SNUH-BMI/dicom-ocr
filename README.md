@@ -14,6 +14,6 @@ Reference: <link>https://docs.aws.amazon.com/textract/latest/dg/setup-awscli-sdk
 For example:
 if you downloaded the files in path 'C:/Users/my/folder'</br>
 change
-<code>%run C:/Users/mchoi/Desktop/dicom/read_dicom.py --path: ~</code></br>
+<code>%run C:/Users/mchoi/Desktop/dicom/read_dicom.py --path ~</code></br>
 to
-<code>%run C:/Users/my/folder/read_dicom.py --path: ~</code>
+<code>%run C:/Users/my/folder/read_dicom.py --path ~</code>
