@@ -9,7 +9,7 @@ import re
 import json
 import argparse
 from copy import deepcopy
-from tqdm import tqdm_notebook
+from tqdm.notebook import tqdm
 
 
 # In[2]:
@@ -43,6 +43,9 @@ def get_document_from(response):
                                             item["Geometry"]["BoundingBox"]["Left"])])
             if item["Text"] == 'Region':
                 table_starts_from = len(rows)
+            if 'ANCILLARY RESULTS' in item["Text"]:
+                return None, None
+            
     lines.sort(key=lambda x: (x[0],x[1][1]))
     
     for idx in range(len(rows)):
@@ -84,32 +87,49 @@ def validate(filename,row):
     
         for col_index in range(del_target+1, len(row)):
             word = row[col_index]
-
-            res_0_1 = re.match('^-?\d[.]$', word)
-            res_0_2 = re.match('^\d[.]\d\d$', word)
-            if (res_0_1 is not None) or (res_0_2 is not None): # 마지막 1 인식 x
-                word += '1'
-            res_1 = re.match('^-?\d$', word) #소수점 인식 x
-            if res_1 is not None: 
-                word += '.1'
-            res_2 = re.match('^-\d\d$', word)
-            if res_2 is not None:
-                word = word[:2]+'.'+word[-1]
-            #--------------------------------------             
-            res = re.match('\d[.]\d\d\d', word)
-            if res is None:
-                res = re.match('^\d\d$', word)
+            if col_index == 0: #region
+                try:
+                    word = float(word) # it means it's not string.
+                    if word == 12: # probably L2
+                        res='ok'
+                    else:
+                        row.insert(0, ' ')    # insert virtual region
+                except ValueError: # it means it's string.
+                    try:
+                        next_word = row[col_index+1]
+                        next_word = float(next_word)
+                    except IndexError: # unvalid row
+                        return None 
+                    except ValueError: # garbage value
+                        del_target = col_index
+                        break
+                    res = 'ok'
+            else: 
+                res_0_1 = re.match('^-?\d[.]$', word)
+                res_0_2 = re.match('^\d[.]\d\d$', word)
+                if res_0_1 is not None or res_0_2 is not None: # 마지막 1 인식 x
+                    word += '1'
+                res_1 = re.match('^-?\d$', word) #소수점 인식 x
+                if res_1 is not None: 
+                    word += '.1'
+                res_2 = re.match('^-\d\d$', word)
+                if res_2 is not None:
+                    word = word[:2]+'.'+word[-1]
+                #--------------------------------------             
+                res = re.match('\d[.]\d\d\d', word)
                 if res is None:
-                    res = re.match('^\d\d\d$', word)
+                    res = re.match('^\d\d$', word)
                     if res is None:
-                        res = re.match('^\d$', word)
-                        if res is not None:
-                            if word[0] > '2':
-                                res = None
+                        res = re.match('^\d\d\d$', word)
                         if res is None:
-                            res = re.match('^-?\d+[.]\d$', word)
+                            res = re.match('^\d$', word)
+                            if res is not None:
+                                if word[0] > '2':
+                                    res = None
                             if res is None:
-                                res = re.match('^-$', word)
+                                res = re.match('^-?\d+[.]\d$', word)
+                                if res is None:
+                                    res = re.match('^-$', word)
            # print(row)
             if res is None:
                 del_target = col_index
@@ -130,28 +150,13 @@ def validate(filename,row):
                     del row[del_target]
 #                     print("SUCCESS")
                 except:
+                    print(filename)
                     print("ERROR")
                     return None
             
         if stop == True:
             break
-
-    if len(row) == 4:
-        r = re.compile("^-?\d[.]\d?$")
-        res = list(filter(r.match, row))
-        if len(res) == 2: # ['Neck', '0.112', '-0.3','1.3']
-            row.insert(2,'NULL')
-            row.insert(4,'NULL')
-        else: # ['Neck', '0.220', '59', '-3.3'] only Z-Score exists
-            row.insert(2,'NULL')
-            row.insert(3,'NULL')
-    if len(row) == 5:
-        try:
-            index = row.index('-')
-            if index == 2:
-                row.insert(3, 'NULL')
-        except ValueError:
-            pass    
+            
         
         
     return row
@@ -175,8 +180,9 @@ if __name__ == "__main__":
 
     with open('output.csv',"w") as fout, open('error.csv',"w")as ferror:
         fout.write("filename,Region,BMD,T-Score(%),T-Score,Z-Score(%),Z-Score\n")
-        ferror.write("filename,Region,BMD,T-Score(%),T-Score,Z-Score(%),Z-Score\n")
-        for f in tqdm_notebook(jsonlst):
+        ferror.write("filename,Region,BMD,T-Score(%),T-Score,Z-Score(%),Z-Score\n") 
+
+        for f in tqdm(jsonlst):
             with open(f) as jsonfile:
                 response = json.load(jsonfile)
             
@@ -196,13 +202,13 @@ if __name__ == "__main__":
                     csv += f.split('.png.json')[0] + ","
                     csv += (",").join(row)
                     csv += "\n"
-                ferror.write(csv)
+                print(csv)
             else:
                 for row in copy_table:
                     csv += f.split('.png.json')[0] + ","
                     csv += (",").join(row)
                     csv += "\n"
-                fout.write(csv)   
+                print(csv)   
 
 
 # In[ ]:

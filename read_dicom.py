@@ -4,13 +4,13 @@ import pydicom as pdicom
 import numpy as np
 import argparse
 import os
-
+from tqdm import tqdm
 
 lstFilesDCM = [] 
 
 def load_scan(path):
   
-    for dirName, subdirList, fileList in os.walk(path):
+    for dirName, subdirList, fileList in tqdm(os.walk(path)):
         for filename in fileList:
             if ".dcm" in filename.lower():
                 lstFilesDCM.append(os.path.join(dirName,filename))
@@ -37,10 +37,13 @@ def print_element(csvpath):
     
     # What elements do you want to print?
     elem = ['SOPInstanceUID',
-            'StudyDate',
+            'StudyDate','AcquisitionDate', 'StudyTime', 'AcquisitionTime',
+            'AccessionNumber',
             'ManufacturerModelName',
-            'PatientID', 'PatientSize', 'PatientWeight', 
+            'PatientSize', 'PatientWeight', 'EthnicGroup' ,
             'DeviceSerialNumber',
+            'DateOfSecondaryCapture',
+            'TimeOfSecondaryCapture',
             'SoftwareVersions',
             'ProtocolName',
             'SeriesDescription']
@@ -50,19 +53,19 @@ def print_element(csvpath):
     string = "filename,"+",".join(elem)+"\n"
     f.write(string)
     
-    for filenameDCM in lstFilesDCM:
+    for filenameDCM in tqdm(lstFilesDCM):
         #read the file
         ds = pdicom.read_file(filenameDCM)
         
         #read elem
         line = []
         line.append(filenameDCM)
-        print(filenameDCM)
+        #print(filenameDCM)
         for e in elem:
             if not (hasattr(ds, e)):
-                if e is 'SeriesDescription':
-                    if ('Femur' or 'Spine' or 'DXA') in ds.ProtocolName:
-                        token = "DXA Reports"
+                if e == 'SeriesDescription' and hasattr(ds,'ProtocolName'):
+                        if ('Femur' or 'Spine' or 'DXA') in ds.ProtocolName:
+                            token = "DXA Reports"
                 else:
                     token = "None"
             else:
@@ -79,7 +82,9 @@ if __name__ == '__main__':
     parser.add_argument('--infile', default='./dicom', help='path to dicom files')
     parser.add_argument('--outfile', default='dataset.csv', help='path to output csv file')
     args = parser.parse_args()
-
+    #--debug
+    # f = open('filelist.txt', encoding='utf-8')
+    # lstFilesDCM = f.readlines()
     lstFilesDCM = load_scan(args.infile)
     encode_tags()
     print_element(args.outfile)
