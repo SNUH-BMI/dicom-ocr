@@ -40,12 +40,12 @@ to
     코드 실행 전 json 폴더로 디렉토리 설정을 해주어야 합니다.(경로 예: 'AP Spine/json')
     같은 폴더 안에 output.csv 파일이 생성됩니다.<br>
     OCR한 결과가 100% 정확하지 않기 때문에 별도의 데이터 QC가 필수적입니다.<br>
-    ![image](https://user-images.githubusercontent.com/42328721/101576590-a95ef500-3a1c-11eb-96e9-885ee5ecb963.png)
+    <img src=https://user-images.githubusercontent.com/42328721/101576590-a95ef500-3a1c-11eb-96e9-885ee5ecb963.png>
   </dd>
   <dt>Phase 5 - Reshape data based on column of the csv file</dt>
   <dd> QC된 데이터를 pandas 라이브러리를 이용하여 재구성합니다. <br>
     코드 실행 전 output.csv 파일의 경로를 설정해주어야 합니다.(경로 예: 'AP Spine/json/output.csv')
     Phase 4 이후 데이터 QC를 제대로 하지 않으면 코드가 동작하지 않을 수 있습니다.<br>
-  ![image](https://user-images.githubusercontent.com/42328721/101577226-d7dcd000-3a1c-11eb-8397-5eaa0e072038.png)
+    <img src=https://user-images.githubusercontent.com/42328721/101577226-d7dcd000-3a1c-11eb-8397-5eaa0e072038.png>
   </dd>
 </dl>
