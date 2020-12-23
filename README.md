@@ -49,3 +49,19 @@ to
     <img src=https://user-images.githubusercontent.com/42328721/101577226-d7dcd000-3a1c-11eb-8397-5eaa0e072038.png>
   </dd>
 </dl>
+
+### What is drop_duplicates_from_records.ipynb for?
+<dl>
+  <dt>중복 레코드가 존재할 수 있습니다.</dt>
+  <dd>cdm에 옮길 데이터에는 중복 레코드가 없어야 합니다. </br>
+      중복 데이터를 거르는 기준은 환자번호와 검사일자 입니다.</br>
+      데이터를 선택하는 자세한 방법은 파일을 확인해주세요.
+  </dd>
+  <dt>준비사항</dt>
+  <dd><b>Phase1</b>에서 생성된 dataset csv파일을 <b>Phase5</b>의 csv 파일과 filename을 기준으로 join 합니다.</br>
+      두 개의 csv 파일에서 filename의 패턴이 동일하지 않을 수 있으며, pandas 등의 라이브러리를 이용해 수정해주시면 됩니다. </br> 
+      결과는 xlsx 파일로 생성하면 코드 수정없이 셀을 실행시킬 수 있습니다. (단, 200만 레코드 이상일 경우에는 csv 파일로 생성하거나, 연도별로 파일을 나누는 것을 추천합니다.) 
+      이 때 촬영부위별(spine, left femur, right femur)로 sheet를 나눠줍니다.
+  </dd>
+  <dd>코드의 효율성은 고려하지 않았습니다. </dd>
+</dl>
